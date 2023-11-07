@@ -150,7 +150,8 @@ def parse_timbre_features_arguments(timbre_arguments: Sequence[str]):
     return explicit_timbre_feat_list
 
 
-# Normalization values (extracted from Dexed train dataset, after log scales have been applied to features)
+# Normalization values (extracted from Dexed training dataset, after log scales have been applied to features,
+#   see https://github.com/gwendal-lv/spinvae)
 _post_distorsion_stats = {
     'mean': {
         'ac_hardness': 46.25082999726012,

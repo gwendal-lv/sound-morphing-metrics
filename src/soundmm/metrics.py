@@ -1,4 +1,4 @@
-
+import warnings
 from pathlib import Path
 from typing import Union, Sequence, Optional
 import tempfile
@@ -10,15 +10,27 @@ from . import timbral_models
 from . import timbrefeatures
 from .timbretoolbox import TimbreToolboxProcess, TimbreToolboxResults
 
-# TODO other args: matlab path (otherwise matlab is deactivated), verbose, ...
+
 def compute_metrics(
         morphing_directories: Sequence[Union[str, Path]],
         timbre_toolbox_path: Optional[Union[str, Path]] = None,
         verbose=False,
         sort_function=sorted,
 ):
-    # TODO doc
-    #    Each morphing directory must contain a sequence
+    """
+    Computes morphing metrics (non-smoothness and non-linearity) for sequences of sounds stored in individual
+    directories.
+    Batch processing is faster, thus several directories (morphings) should be provided to this function.
+
+    :param morphing_directories: Each morphing directory must contain a sequence of morphed audio files.
+    :param timbre_toolbox_path: The path to your TimbreToolbox installation -
+                see https://github.com/VincentPerreault0/timbretoolbox for instructions. If not provided,
+                TimbreToolbox features and associated morphing metrics will not be computed.
+    :param verbose: bool
+    :param sort_function: An optional custom function to sort each morphed sequence of files it its own  directory.
+    :return: morphing_metrics, timbre_features (Pandas DataFrames)
+    """
+    #
     # Retrieve and sort all audio files that should be analyzed
     audio_files_types = ('.wav', )  # TODO improve, soundfile does not support .mp3
     morphing_directories = [Path(d) for d in morphing_directories]
@@ -29,7 +41,9 @@ def compute_metrics(
             f"Morphing directory {morphing_dir} must contain more than 3 audio files ({len(audio_files)} files found)"
         audio_files_path[i] = audio_files
 
-    # TODO compute AudioCommons Timbral Models features
+    # compute AudioCommons Timbral Models features
+    if verbose:
+        print("Computing AudioCommons Timbral Models features...")
     all_ac_features = list()
     for morphing_index, (morphing_dir, audio_files) in enumerate(zip(morphing_directories, audio_files_path)):
         all_ac_features.append(list())
@@ -70,11 +84,19 @@ def compute_metrics(
                 all_tt_features[morphing_index][j] = \
                     {f'tt_{k}': v for k, v in all_tt_features[morphing_index][j].items()}
             all_tt_features[morphing_index] = pd.DataFrame(all_tt_features[morphing_index])
+    else:
+        all_tt_features = None
+        if verbose:
+            warnings.warn("TimbreToolbox path was not provided, so the corresponding audio features won't be computed")
 
     # Concatenate all morphing sequences into a long dataframes
     #     concatenate ACTM and TT features into wider dataframes,
-    all_ac_features, all_tt_features = pd.concat(all_ac_features), pd.concat(all_tt_features)
-    all_raw_features = pd.concat((all_ac_features, all_tt_features), axis=1)
+    all_ac_features = pd.concat(all_ac_features, axis=0)
+    if all_tt_features is not None:
+        all_tt_features = pd.concat(all_tt_features, axis=0)
+        all_raw_features = pd.concat((all_ac_features, all_tt_features), axis=1)
+    else:
+        all_raw_features = all_ac_features
 
     # feature values post-processing (log scales, normalizations, ...)
     timbre_features = timbrefeatures.TimbreFeatures(all_raw_features)
@@ -102,7 +124,6 @@ def compute_metrics(
                 'metric': metric_name,
                 **morphing_metrics[metric_name]
             })
-        a = 0
     all_morphing_metrics = pd.DataFrame(all_morphing_metrics)
 
     # TODO Don't return highly correlated features
