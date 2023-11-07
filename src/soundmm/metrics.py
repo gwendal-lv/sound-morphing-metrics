@@ -1,19 +1,20 @@
 
 from pathlib import Path
-from typing import Union, Sequence
+from typing import Union, Sequence, Optional
+import tempfile
 
 import pandas as pd
 import numpy as np
 
 from . import timbral_models
 from . import timbrefeatures
-
+from .timbretoolbox import TimbreToolboxProcess, TimbreToolboxResults
 
 # TODO other args: matlab path (otherwise matlab is deactivated), verbose, ...
 def compute_metrics(
         morphing_directories: Sequence[Union[str, Path]],
-
-        skip_timbre_toolbox=False,
+        timbre_toolbox_path: Optional[Union[str, Path]] = None,
+        verbose=False,
         sort_function=sorted,
 ):
     # TODO doc
@@ -45,18 +46,40 @@ def compute_metrics(
             })
     all_ac_features = [pd.DataFrame(features) for features in all_ac_features]
 
-    if not skip_timbre_toolbox:
-        raise NotImplementedError("Matlab TT call not implemented")
+    if timbre_toolbox_path is not None:
+        # Prepare directories for results storage (matlab will store results as .csv in those dirs)
+        tt_results = TimbreToolboxResults(morphing_directories, audio_files_path)
+        tt_results.clean_stats_files()
+        # build a file that contains all directories to be analyzed in a single Matlab call
+        with tempfile.NamedTemporaryFile('w') as matlab_input_file:
+            # Absolute paths required (the matlab script will cd)
+            for d in morphing_directories:
+                matlab_input_file.write(str(d.resolve()) + "\n")
+            matlab_input_file.flush()
+            # TODO run TT
+            # TODO pre-cleanup
+            tt_process = TimbreToolboxProcess(
+                Path(timbre_toolbox_path), Path(matlab_input_file.name), verbose=verbose, process_index=0)
+            tt_process.run()
+        # Retrieve results and clean temp .csv files
+        all_tt_features = tt_results.read()
+        tt_results.clean_stats_files()
+        # And transform features into proper dataframes (similar to AC dfs)
+        for morphing_index, _ in enumerate(morphing_directories):
+            for j in range(len(all_tt_features[morphing_index])):
+                all_tt_features[morphing_index][j] = \
+                    {f'tt_{k}': v for k, v in all_tt_features[morphing_index][j].items()}
+            all_tt_features[morphing_index] = pd.DataFrame(all_tt_features[morphing_index])
 
-    # TODO Concatenate ACTM and TT features into wider dataframes,
-    #   then concatenate all morphing sequences into a single long dataframe
-    all_raw_features = all_ac_features  # TODO append TT features...
-    all_raw_features = pd.concat(all_raw_features)
+    # Concatenate all morphing sequences into a long dataframes
+    #     concatenate ACTM and TT features into wider dataframes,
+    all_ac_features, all_tt_features = pd.concat(all_ac_features), pd.concat(all_tt_features)
+    all_raw_features = pd.concat((all_ac_features, all_tt_features), axis=1)
 
     # feature values post-processing (log scales, normalizations, ...)
     timbre_features = timbrefeatures.TimbreFeatures(all_raw_features)
 
-    # TODO Compute morphing metrics for each morphing directory, then aggregate results into a dataframe
+    # Compute morphing metrics for each morphing directory, then aggregate results into a dataframe
     all_morphing_metrics = list()
     morphing_description_cols = [c for c in all_raw_features.columns if c.startswith('morphing_')]
     for morphing_index, _ in enumerate(morphing_directories):
