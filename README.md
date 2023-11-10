@@ -7,7 +7,7 @@ Then, the *smoothness* and *non-linearity* morphing metrics can be extracted for
 Detailed examples and usage instructions are given in the 
 [examples/soundmm_demo.ipynb](examples/soundmm_demo.ipynb) notebook from this repository.
 
-This work has been introduced in our IEEE ICASSP 2023 paper 
+This work has been introduced in the IEEE ICASSP 2023 paper 
 titled [Synthesizer Preset Interpolation Using Transformer Auto-Encoders](https://ieeexplore.ieee.org/document/10096397).
 
 # Dependencies
