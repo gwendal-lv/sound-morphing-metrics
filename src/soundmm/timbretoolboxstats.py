@@ -9,7 +9,7 @@ excluded_features = ["Noisiness_"]  # Seems broken, at least for DX7 sound
 log_scale_features = [
     # 2022 log-scale features
     # Values in Hz
-    'F0_', 'SpecCent_', 'SpecSpread_', 'SpecRollOff_'
+    'F0_', 'SpecCent_', 'SpecSpread_', 'SpecRollOff_',
     # ratio explodes (seems to be exponentially distributed)
     'OddEvenRatio_',
 

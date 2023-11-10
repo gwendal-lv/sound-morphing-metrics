@@ -87,7 +87,7 @@ def compute_metrics(
     else:
         all_tt_features = None
         if verbose:
-            warnings.warn("TimbreToolbox path was not provided, so the corresponding audio features won't be computed")
+            print("TimbreToolbox path was not provided, so the corresponding audio features won't be computed")
 
     # Concatenate all morphing sequences into a long dataframes
     #     concatenate ACTM and TT features into wider dataframes,
