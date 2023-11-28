@@ -3,7 +3,10 @@ Statistics and other information about TimbreToolbox features
 """
 
 # list of excluded features
-excluded_features = ["Noisiness_"]  # Seems broken, at least for DX7 sound
+excluded_features = [
+    "Noisiness_",  # Seems broken, at least for DX7 sound
+    "AmpMod",  # its smoothness and nonlinearity are uncorrelated to subjective results
+]
 
 # Features that should be projected onto a perceptual log scale
 log_scale_features = [

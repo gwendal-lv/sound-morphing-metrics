@@ -17,6 +17,7 @@ if __name__ == "__main__":
     morphing_metrics, timbre_features = src.soundmm.metrics.compute_metrics(
         morphing_directories,
         # timbre_toolbox_path='~/Documents/MATLAB/timbretoolbox',
+        normalize=True,
         verbose=True,
     )
 

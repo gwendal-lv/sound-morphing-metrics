@@ -14,6 +14,7 @@ from .timbretoolbox import TimbreToolboxProcess, TimbreToolboxResults
 def compute_metrics(
         morphing_directories: Sequence[Union[str, Path]],
         timbre_toolbox_path: Optional[Union[str, Path]] = None,
+        normalize=False,
         verbose=False,
         sort_function=sorted,
 ):
@@ -26,11 +27,13 @@ def compute_metrics(
     :param timbre_toolbox_path: The path to your TimbreToolbox installation -
                 see https://github.com/VincentPerreault0/timbretoolbox for instructions. If not provided,
                 TimbreToolbox features and associated morphing metrics will not be computed.
+    :param normalize: if True, metric values (for a given audio feature) will be normalized such that
+                their mean is 1.0.
     :param verbose: bool
     :param sort_function: An optional custom function to sort each morphed sequence of files it its own  directory.
     :return: morphing_metrics, timbre_features (Pandas DataFrames)
     """
-    #
+    metrics_names = ('nonsmoothness', 'nonlinearity')
     # Retrieve and sort all audio files that should be analyzed
     audio_files_types = ('.wav', )  # TODO improve, soundfile does not support .mp3
     morphing_directories = [Path(d) for d in morphing_directories]
@@ -106,7 +109,7 @@ def compute_metrics(
     morphing_description_cols = [c for c in all_raw_features.columns if c.startswith('morphing_')]
     for morphing_index, _ in enumerate(morphing_directories):
         morphing_features = timbre_features.postproc_df[timbre_features.postproc_df.morphing_index == morphing_index]
-        morphing_metrics = {'nonsmoothness': dict(), 'nonlinearity': dict()}
+        morphing_metrics = {m: dict() for m in metrics_names}
         step_h = 1.0 / (len(morphing_features) - 1.0)
         for feature_name in timbre_features.feature_cols:
             feature_values = morphing_features[feature_name].values
@@ -118,15 +121,19 @@ def compute_metrics(
             # non-linearity, quantified as the RMS of the error vs. the ideal linear curve
             target_linear_values = np.linspace(feature_values[0], feature_values[-1], num=feature_values.shape[0]).T
             morphing_metrics['nonlinearity'][feature_name] = np.sqrt( ((feature_values - target_linear_values) ** 2).mean() )
-        for metric_name in ['nonsmoothness', 'nonlinearity']:
+        for m in metrics_names:
             all_morphing_metrics.append({
                 **dict(morphing_features[morphing_description_cols].iloc[0]),
-                'metric': metric_name,
-                **morphing_metrics[metric_name]
+                'metric': m,
+                **morphing_metrics[m]
             })
     all_morphing_metrics = pd.DataFrame(all_morphing_metrics)
 
-    # TODO Don't return highly correlated features
+    # Normalization, if required
+    if normalize:
+        for m in metrics_names:
+            means = all_morphing_metrics[all_morphing_metrics.metric == m][timbre_features.feature_cols].mean()
+            all_morphing_metrics.loc[all_morphing_metrics.metric == m, timbre_features.feature_cols] /= means
 
     return all_morphing_metrics, timbre_features.postproc_df
 
