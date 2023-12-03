@@ -7,9 +7,6 @@ Then, the *smoothness* and *non-linearity* morphing metrics can be extracted for
 Detailed examples and usage instructions are given in the 
 [examples/soundmm_demo.ipynb](examples/soundmm_demo.ipynb) notebook from this repository.
 
-This work has been introduced in the IEEE ICASSP 2023 paper 
-titled [Synthesizer Preset Interpolation Using Transformer Auto-Encoders](https://ieeexplore.ieee.org/document/10096397).
-
 # Dependencies
 
 This project is mostly based on a Python package whose dependencies are the following:
@@ -27,22 +24,9 @@ Please check instructions on their Github repository.
 
 # Usage
 
-The easiest way to use this package is to integrate the [src/soundmm](src/soundmm) directory into your
+The easiest way to use this package is to copy the [src/soundmm](src/soundmm) directory into your
 Python project.
 
 Please refer to the [examples/soundmm_demo.ipynb](examples/soundmm_demo.ipynb) notebook to get more detailed instructions.
 
-# Citing
 
-If you use our work, please cite the ICASSP 2023 paper:
-
-```
-@INPROCEEDINGS{10096397,
-  author={Le Vaillant, Gwendal and Dutoit, Thierry},
-  booktitle={ICASSP 2023 - 2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
-  title={Synthesizer Preset Interpolation Using Transformer Auto-Encoders}, 
-  year={2023},
-  pages={1-5},
-  doi={10.1109/ICASSP49357.2023.10096397}
-}
-```
