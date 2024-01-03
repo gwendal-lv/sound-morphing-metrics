@@ -29,4 +29,16 @@ Python project.
 
 Please refer to the [examples/soundmm_demo.ipynb](examples/soundmm_demo.ipynb) notebook to get more detailed instructions.
 
+# Citing
 
+If you use our work, please cite the following [preprint](https://doi.org/10.36227/techrxiv.170327281.10174081/v1): 
+
+```
+@article{LeVaillant_2023,
+title={Interpolation of Synthesizer Presets using Timbre-Regularized Auto-Encoders},
+url={http://dx.doi.org/10.36227/techrxiv.170327281.10174081/v1},
+DOI={10.36227/techrxiv.170327281.10174081/v1},
+author={Le Vaillant, Gwendal and Dutoit, Thierry},
+year={2023},
+month=dec }
+```
