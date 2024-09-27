@@ -1,7 +1,9 @@
 # soundmm: Sound Morphing Metrics
 
-In order to compute the metrics of a given morphing, the ```soundmm``` package can compute 
-audio features for each individual morphed audio sample.
+Sound morphing refers to the process of smoothly transforming one sound into another by gradually changing its characteristics, such as timbre or frequency content. When morphing is properly executed, intermediate sounds retain perceptual qualities from both the source and target sounds.
+
+The ```soundmm``` package focuses on objective, quantitative evaluations of morphing, offering a tool for analyzing morphing quality in audio resynthesis and transformation tasks.
+Given a sequence of audio files, the ```soundmm``` package computes audio features for each individual morphed (intermediate) audio sample.
 Then, the *smoothness* and *linearity* morphing metrics can be extracted for each audio feature.
 
 Detailed examples and usage instructions are given in the 
