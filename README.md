@@ -2,14 +2,14 @@
 
 In order to compute the metrics of a given morphing, the ```soundmm``` package can compute 
 audio features for each individual morphed audio sample.
-Then, the *smoothness* and *non-linearity* morphing metrics can be extracted for each audio feature.
+Then, the *smoothness* and *linearity* morphing metrics can be extracted for each audio feature.
 
 Detailed examples and usage instructions are given in the 
 [examples/soundmm_demo.ipynb](examples/soundmm_demo.ipynb) notebook from this repository.
 
 # Dependencies
 
-This project is mostly based on a Python package whose dependencies are the following:
+This project uses the [timbral_models](https://github.com/AudioCommons/timbral_models) package whose dependencies are the following:
 
 ```
 pip3 install numpy pandas scipy soundfile librosa pyloudnorm
@@ -31,14 +31,15 @@ Please refer to the [examples/soundmm_demo.ipynb](examples/soundmm_demo.ipynb) n
 
 # Citing
 
-If you use our work, please cite the following [preprint](https://doi.org/10.36227/techrxiv.170327281.10174081/v1): 
+If you use our work, please cite the following article: 
 
 ```
-@article{LeVaillant_2023,
-title={Interpolation of Synthesizer Presets using Timbre-Regularized Auto-Encoders},
-url={http://dx.doi.org/10.36227/techrxiv.170327281.10174081/v1},
-DOI={10.36227/techrxiv.170327281.10174081/v1},
-author={Le Vaillant, Gwendal and Dutoit, Thierry},
-year={2023},
-month=dec }
+@ARTICLE{LeVaillant_2024,
+  author={Le Vaillant, Gwendal and Dutoit, Thierry},
+  journal={IEEE/ACM Transactions on Audio, Speech, and Language Processing}, 
+  title={Latent Space Interpolation of Synthesizer Parameters Using Timbre-Regularized Auto-Encoders}, 
+  year={2024},
+  volume={32},
+  pages={3379-3392},
+  doi={10.1109/TASLP.2024.3426987}}
 ```

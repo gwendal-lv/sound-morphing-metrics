@@ -14,24 +14,27 @@ from .timbretoolbox import TimbreToolboxProcess, TimbreToolboxResults
 def compute_metrics(
         morphing_directories: Sequence[Union[str, Path]],
         timbre_toolbox_path: Optional[Union[str, Path]] = None,
+        positive_metrics=False,
         normalize=False,
         verbose=False,
         sort_function=sorted,
 ):
     """
     Computes morphing metrics (non-smoothness and non-linearity) for sequences of sounds stored in individual
-    directories.
-    Batch processing is faster, thus several directories (morphings) should be provided to this function.
+    directories. Batch processing is faster, thus several directories (morphings) should be provided to this function.
 
     :param morphing_directories: Each morphing directory must contain a sequence of morphed audio files.
     :param timbre_toolbox_path: The path to your TimbreToolbox installation -
-                see https://github.com/VincentPerreault0/timbretoolbox for instructions. If not provided,
-                TimbreToolbox features and associated morphing metrics will not be computed.
+        see https://github.com/VincentPerreault0/timbretoolbox for instructions. If not provided,
+        TimbreToolbox features and associated morphing metrics will not be computed.
+    :param positive_metrics: If False (default), returns negative values with increasing values (towards 0.0)
+        indicating a better morphing. If True, returns positive values with decreasing values (towards 0.0) indicating
+        a better morphing.
     :param normalize: if True, metric values (for a given audio feature) will be normalized such that
-                their mean is 1.0.
+        their mean is 1.0.
     :param verbose: bool
     :param sort_function: An optional custom function to sort each morphed sequence of files it its own  directory.
-    :return: morphing_metrics, timbre_features (Pandas DataFrames)
+    :returns: morphing_metrics, timbre_features (Pandas DataFrames)
     """
     metrics_names = ('nonsmoothness', 'nonlinearity')
     # Retrieve and sort all audio files that should be analyzed
@@ -134,6 +137,9 @@ def compute_metrics(
         for m in metrics_names:
             means = all_morphing_metrics[all_morphing_metrics.metric == m][timbre_features.feature_cols].mean()
             all_morphing_metrics.loc[all_morphing_metrics.metric == m, timbre_features.feature_cols] /= means
+    if not positive_metrics:  # Return smoothness/linearity instead of nonsmoothness/nonlinearity
+        all_morphing_metrics[timbre_features.feature_cols] *= -1.0
+        all_morphing_metrics['metric'] = all_morphing_metrics['metric'].apply(lambda x: x.replace('non', ''))
 
     return all_morphing_metrics, timbre_features.postproc_df
 

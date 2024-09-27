@@ -18,6 +18,7 @@ if __name__ == "__main__":
         morphing_directories,
         # timbre_toolbox_path='~/Documents/MATLAB/timbretoolbox',
         normalize=True,
+        positive_metrics=False,
         verbose=True,
     )
 
